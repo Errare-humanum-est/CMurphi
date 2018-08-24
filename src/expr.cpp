@@ -48,7 +48,7 @@ expr::expr(const double value, typedecl * const type)	// AP: new constructor
 }
 
 expr::expr(void)
-:value(0), type(NULL), constval(FALSE), sideeffects(FALSE)
+:value(0), rvalue(0.0), type(NULL), constval(FALSE), sideeffects(FALSE)
 {
 }
 
@@ -284,7 +284,7 @@ unaryexpr::unaryexpr(typedecl * type, int op, expr * left)
 }
 
 unaryexpr::unaryexpr(typedecl * type, expr * left)
-:  expr(type, left->hasvalue(), left->has_side_effects()), left(left)
+:  expr(type, left->hasvalue(), left->has_side_effects()), op(0), left(left)
 {
 }
 
@@ -365,43 +365,29 @@ equalexpr::equalexpr(int op, expr * left, expr * right)
   if (constval) {
     switch (op) {
     case '=':
-      switch (real_left) {
-      case true:
-	{
-	  if (real_right)
-	    value = left->getrvalue() == right->getrvalue();
-	  else
-	    value = left->getrvalue() == right->getvalue();
-	  break;
-	}
-      case false:
-	{
-	  if (real_right)
-	    value = left->getvalue() == right->getrvalue();
-	  else
-	    value = left->getvalue() == right->getvalue();
-	  break;
-	}
-      }
+      if (real_left) {
+	    if (real_right)
+	      value = left->getrvalue() == right->getrvalue();
+	    else
+	      value = left->getrvalue() == right->getvalue();
+	  } else {
+	    if (real_right)
+	      value = left->getvalue() == right->getrvalue();
+	    else
+	      value = left->getvalue() == right->getvalue();
+	  }
       break;
     case NEQ:
-      switch (real_left) {
-      case true:
-	{
-	  if (real_right)
-	    value = left->getrvalue() != right->getrvalue();
-	  else
-	    value = left->getrvalue() != right->getvalue();
-	  break;
-	}
-      case false:
-	{
-	  if (real_right)
-	    value = left->getvalue() != right->getrvalue();
-	  else
-	    value = left->getvalue() != right->getvalue();
-	  break;
-	}
+      if (real_left) {
+	    if (real_right)
+	      value = left->getrvalue() != right->getrvalue();
+	    else
+	      value = left->getrvalue() != right->getvalue();
+      } else {
+	    if (real_right)
+	      value = left->getvalue() != right->getrvalue();
+	    else
+	      value = left->getvalue() != right->getvalue();
       }
       break;
     default:
@@ -434,84 +420,56 @@ compexpr::compexpr(int op, expr * left, expr * right)
   if (constval) {
     switch (op) {
     case '<':
-      switch (real_left) {
-      case true:
-	{
-	  if (real_right)
-	    value = left->getrvalue() < right->getrvalue();
-	  else
-	    value = left->getrvalue() < right->getvalue();
-	  break;
-	}
-      case false:
-	{
-	  if (real_right)
-	    value = left->getvalue() < right->getrvalue();
-	  else
-	    value = left->getvalue() < right->getvalue();
-	  break;
-	}
-      }
+      if (real_left) {
+	    if (real_right)
+	      value = left->getrvalue() < right->getrvalue();
+	    else
+	      value = left->getrvalue() < right->getvalue();
+	  } else {
+	    if (real_right)
+	      value = left->getvalue() < right->getrvalue();
+	    else
+	      value = left->getvalue() < right->getvalue();
+	  }
       break;
     case LEQ:
-      switch (real_left) {
-      case true:
-	{
-	  if (real_right)
-	    value = left->getrvalue() <= right->getrvalue();
-	  else
-	    value = left->getrvalue() <= right->getvalue();
-	  break;
-	}
-      case false:
-	{
-	  if (real_right)
-	    value = left->getvalue() <= right->getrvalue();
-	  else
-	    value = left->getvalue() <= right->getvalue();
-	  break;
-	}
-      }
+      if (real_left) {
+	    if (real_right)
+	      value = left->getrvalue() <= right->getrvalue();
+	    else
+	      value = left->getrvalue() <= right->getvalue();
+	  } else {
+	    if (real_right)
+	      value = left->getvalue() <= right->getrvalue();
+	    else
+	      value = left->getvalue() <= right->getvalue();
+	  }
       break;
     case '>':
-      switch (real_left) {
-      case true:
-	{
-	  if (real_right)
-	    value = left->getrvalue() > right->getrvalue();
-	  else
-	    value = left->getrvalue() > right->getvalue();
-	  break;
-	}
-      case false:
-	{
-	  if (real_right)
-	    value = left->getvalue() > right->getrvalue();
-	  else
-	    value = left->getvalue() > right->getvalue();
-	  break;
-	}
-      }
+      if (real_left) {
+	    if (real_right)
+	      value = left->getrvalue() > right->getrvalue();
+	    else
+	      value = left->getrvalue() > right->getvalue();
+	  } else {
+	    if (real_right)
+	      value = left->getvalue() > right->getrvalue();
+	    else
+	      value = left->getvalue() > right->getvalue();
+	  }
       break;
     case GEQ:
-      switch (real_left) {
-      case true:
-	{
-	  if (real_right)
-	    value = left->getrvalue() >= right->getrvalue();
-	  else
-	    value = left->getrvalue() >= right->getvalue();
-	  break;
-	}
-      case false:
-	{
-	  if (real_right)
-	    value = left->getvalue() >= right->getrvalue();
-	  else
-	    value = left->getvalue() >= right->getvalue();
-	  break;
-	}
-      }
+      if (real_left) {
+	    if (real_right)
+	      value = left->getrvalue() >= right->getrvalue();
+	    else
+	      value = left->getrvalue() >= right->getvalue();
+	  } else {
+	    if (real_right)
+	      value = left->getvalue() >= right->getrvalue();
+	    else
+	      value = left->getvalue() >= right->getvalue();
+	  }
       break;
     default:
       Error.Error
@@ -545,44 +503,30 @@ arithexpr::arithexpr(int op, expr * left, expr * right)
   if (constval) {
     switch (op) {
     case '+':
-      switch (real_left) {
-      case true:
-	{
-	  if (real_right)
-	    rvalue = left->getrvalue() + right->getrvalue();
-	  else
-	    rvalue = left->getrvalue() + right->getvalue();
-	  break;
-	}
-      case false:
-	{
-	  if (real_right)
-	    rvalue = left->getvalue() + right->getrvalue();
-	  else
-	    value = left->getvalue() + right->getvalue();
-	  break;
-	}
-      }
+      if (real_left) {
+	    if (real_right)
+	      rvalue = left->getrvalue() + right->getrvalue();
+	    else
+	      rvalue = left->getrvalue() + right->getvalue();
+	  } else {
+	    if (real_right)
+	      rvalue = left->getvalue() + right->getrvalue();
+	    else
+	      value = left->getvalue() + right->getvalue();
+	  }
       break;
     case '-':
-      switch (real_left) {
-      case true:
-	{
-	  if (real_right)
-	    rvalue = left->getrvalue() - right->getrvalue();
-	  else
-	    rvalue = left->getrvalue() - right->getvalue();
-	  break;
-	}
-      case false:
-	{
-	  if (real_right)
-	    rvalue = left->getvalue() - right->getrvalue();
-	  else
-	    value = left->getvalue() - right->getvalue();
-	  break;
-	}
-      }
+      if (real_left) {
+	    if (real_right)
+	      rvalue = left->getrvalue() - right->getrvalue();
+	    else
+	      rvalue = left->getrvalue() - right->getvalue();
+	  } else {
+	    if (real_right)
+	      rvalue = left->getvalue() - right->getrvalue();
+	    else
+	      value = left->getvalue() - right->getvalue();
+	  }
       break;
     default:
       /* Commented out to allow for mulexprs. */
@@ -614,32 +558,18 @@ unexpr::unexpr(int op, expr * left)
   if (constval) {
     switch (op) {
     case '+':
-      switch (real_left) {
-      case true:
-	{
-	  rvalue = left->getrvalue();
-	  break;
-	}
-      case false:
-	{
-	  value = left->getvalue();
-	  break;
-	}
-      }
+      if (real_left) {
+	    rvalue = left->getrvalue();
+	  } else {
+	    value = left->getvalue();
+	  }
       break;
     case '-':
-      switch (real_left) {
-      case true:
-	{
-	  rvalue = -left->getrvalue();
-	  break;
-	}
-      case false:
-	{
-	  value = -left->getvalue();
-	  break;
-	}
-      }
+      if (real_left) {
+	    rvalue = -left->getrvalue();
+	  } else {
+	    value = -left->getvalue();
+	  }
       break;
     default:
       Error.Error("Internal: surprising value for op in unexpr::unexpr.");
@@ -666,44 +596,30 @@ mulexpr::mulexpr(int op, expr * left, expr * right)
   if (constval) {
     switch (op) {
     case '*':
-      switch (real_left) {
-      case true:
-	{
-	  if (real_right)
-	    rvalue = left->getrvalue() * right->getrvalue();
-	  else
-	    rvalue = left->getrvalue() * right->getvalue();
-	  break;
-	}
-      case false:
-	{
-	  if (real_right)
-	    rvalue = left->getvalue() * right->getrvalue();
-	  else
-	    value = left->getvalue() * right->getvalue();
-	  break;
-	}
-      }
+      if (real_left) {
+	    if (real_right)
+	      rvalue = left->getrvalue() * right->getrvalue();
+	    else
+	      rvalue = left->getrvalue() * right->getvalue();
+	  } else {
+	    if (real_right)
+	      rvalue = left->getvalue() * right->getrvalue();
+	    else
+	      value = left->getvalue() * right->getvalue();
+	  }
       break;
     case '/':
-      switch (real_left) {
-      case true:
-	{
-	  if (real_right)
-	    rvalue = left->getrvalue() / right->getrvalue();
-	  else
-	    rvalue = left->getrvalue() / right->getvalue();
-	  break;
-	}
-      case false:
-	{
-	  if (real_right)
-	    rvalue = left->getvalue() / right->getrvalue();
-	  else
-	    value = left->getvalue() / right->getvalue();
-	  break;
-	}
-      }
+      if (real_left) {
+	    if (real_right)
+	      rvalue = left->getrvalue() / right->getrvalue();
+	    else
+	      rvalue = left->getrvalue() / right->getvalue();
+	  } else {
+	    if (real_right)
+	      rvalue = left->getvalue() / right->getrvalue();
+	    else
+	      value = left->getvalue() / right->getvalue();
+	  }
       break;
     case '%':			/* not allowed as of 9/92, but just in case. */
       if (real_left || real_right)
@@ -763,6 +679,8 @@ designator::designator(ste * origin,
 		       bool isconst, bool maybeundefined, int val)
 :expr(val, type),
 origin(origin),
+arrayref(NULL),
+fieldref(NULL),
 lvalue(islvalue), left(NULL), dclass(Base), maybeundefined(maybeundefined)
 {
   constval = isconst;
@@ -775,6 +693,8 @@ designator::designator(ste * origin,
 		       bool isconst, bool maybeundefined, double val)
 :expr(val, type),
 origin(origin),
+arrayref(NULL),
+fieldref(NULL),
 lvalue(islvalue), left(NULL), dclass(Base), maybeundefined(maybeundefined)
 {
   constval = isconst;
@@ -786,7 +706,8 @@ designator::designator(designator * left, expr * ar)
 :  
 expr(NULL, FALSE,
  left->has_side_effects() || ar->has_side_effects()),
-left(left), arrayref(ar), lvalue(left->lvalue), dclass(ArrayRef)
+left(left), origin(NULL), arrayref(ar), fieldref(NULL), lvalue(left->lvalue), dclass(ArrayRef),
+maybeundefined(left->checkundefined())
 {
   typedecl *t = left->gettype();
   if (Error.CondError(t->gettypeclass() != typedecl::Array
@@ -822,7 +743,11 @@ designator::designator(designator * left, lexid * fr)
 :  
 expr(NULL, FALSE,
  left->has_side_effects()),
-left(left), lvalue(left->lvalue), dclass(FieldRef)
+origin(NULL),
+arrayref(NULL),
+fieldref(NULL),
+left(left), lvalue(left->lvalue), dclass(FieldRef),
+maybeundefined(left->checkundefined())
 {
   typedecl *t = left->gettype();
   if (!Error.CondError(t->gettypeclass() != typedecl::Record,

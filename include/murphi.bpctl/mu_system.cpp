@@ -139,7 +139,7 @@ state *StateManager::QueueDequeue(double &p)
 
 state *StateManager::ResetQueue(long level)
 {
-  stack->reset(level);
+  return stack->reset(level);
 }
 
 void StateManager::QueuePush(state * s, double p_r, double p_f)

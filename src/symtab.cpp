@@ -221,5 +221,12 @@ ste *symboltable::dupscope() const
   return beginning;
 }
 
+ste *symboltable::dupscopereverse() const
+{
+  ste *s = dupscope();
+  if (s == NULL) return NULL;
+  return s->reverse();
+}
+
 const int symboltable::globalscope = 1;
 

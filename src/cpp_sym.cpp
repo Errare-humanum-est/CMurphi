@@ -443,7 +443,6 @@ void symmetryclass::generate_heuristic_fast_normalization()
 	      "  %s.Permute(Perm,0);\n"
 	      "  if (args->multiset_reduction.value)\n"
 	      "    %s.MultisetSort();\n" "\n", var->s->getvalue()->mu_name,
-	      var->s->getvalue()->mu_name, var->s->getvalue()->mu_name,
 	      var->s->getvalue()->mu_name);
 
   fprintf(codefile, "};\n");

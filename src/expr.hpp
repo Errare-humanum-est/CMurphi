@@ -52,7 +52,8 @@ protected:
   // initializer used by subclasses. 
    expr(void);
    expr(typedecl * type, bool constval, bool sideeffects)
-  :type(type), constval(constval), sideeffects(sideeffects) {
+  :type(type), constval(constval), sideeffects(sideeffects),
+   value(0), rvalue(0.0) {
   };
 
 public:
@@ -381,6 +382,7 @@ struct exprlist {
   // initializer
    exprlist(expr * e, exprlist * next = NULL);
    exprlist(bool b, exprlist * next = NULL);	// b should be TRUE
+   virtual ~exprlist() {}
   // in current implementation
   exprlist *reverse();		/* reverses it. */
   friend bool matchparams(ste * formals, exprlist * actuals);

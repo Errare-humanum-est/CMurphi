@@ -495,10 +495,14 @@ int multisettypedecl::get_num_limit_locals(typedecl * e)
   ste *f;
 
   switch (e->gettypeclass()) {
-  case typedecl::Scalarset:
+  case typedecl::Real:
   case typedecl::Enum:
   case typedecl::Range:
+  case typedecl::MultiSet:
+  case typedecl::MultiSetID:
+  case typedecl::Scalarset:
   case typedecl::Union:
+  case typedecl::Error_type:
     return 0;
   case typedecl::Record:
     ret = 0;
@@ -520,10 +524,14 @@ int arraytypedecl::get_num_limit_locals(typedecl * e)
   ste *f;
 
   switch (e->gettypeclass()) {
-  case typedecl::Scalarset:
+  case typedecl::Real:
   case typedecl::Enum:
   case typedecl::Range:
+  case typedecl::MultiSet:
+  case typedecl::MultiSetID:
+  case typedecl::Scalarset:
   case typedecl::Union:
+  case typedecl::Error_type:
     return 0;
   case typedecl::Record:
     ret = 0;
@@ -620,8 +628,10 @@ void arraytypedecl::generate_limit_step2(typedecl * d, char *var,
 			       limit_strategy);
 	  fprintf(codefile, "  }\n");
 	  break;
+	default: break;
 	}
       }
+      break;
     case typedecl::Enum:
       for (f = ((enumtypedecl *) e2)->getidvalues();
 	   f != NULL && type_equal(f->getvalue()->gettype(), e2);
@@ -644,6 +654,7 @@ void arraytypedecl::generate_limit_step2(typedecl * d, char *var,
 			   limit_strategy);
       fprintf(codefile, "  }\n");
       break;
+    default: break;
     }
   } else if (e->gettypeclass() == typedecl::Record) {
     for (f = e->getfields(); f != NULL; f = f->next) {
@@ -1534,7 +1545,7 @@ generate_canonicalize_function(symmetryclass & symmetry)
 		d->mu_name, d->getsize(), d->getsize(),
 		d->mu_name, d->getsize(),
 		d->mu_name, d->getsize(),
-		d->mu_name, d->getsize(), d->mu_name);
+		d->mu_name, d->getsize());
       }
     }
     generate_simple_sort();
@@ -2469,8 +2480,10 @@ void multisettypedecl::generate_limit_step2(char *var, typedecl * e,
 			       limit_strategy);
 	  fprintf(codefile, "  }\n");
 	  break;
+	default: break;
 	}
       }
+      break;
     case typedecl::Enum:
       for (f = ((enumtypedecl *) e2)->getidvalues();
 	   f != NULL && type_equal(f->getvalue()->gettype(), e2);
@@ -2492,6 +2505,7 @@ void multisettypedecl::generate_limit_step2(char *var, typedecl * e,
 			   limit_strategy);
       fprintf(codefile, "  }\n");
       break;
+    default: break;
     }
   } else if (e->gettypeclass() == typedecl::Record) {
     for (f = e->getfields(); f != NULL; f = f->next) {

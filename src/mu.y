@@ -602,7 +602,7 @@ externFunDecl:
 			  $<decl_p>$ = func;
 				      func->extern_def = TRUE;
 				      func->include_file_ext = $10;
-			  func->params = symtab->dupscope()->reverse();
+			  func->params = symtab->dupscopereverse();
 			  if ($9->name == NULL)
 			    symtab->declare_global(
 				       ltable.enter(
@@ -639,7 +639,7 @@ externProcDecl:
 			  $<decl_p>$ = new procdecl();
 			  ((procdecl *) $<decl_p>$)->extern_def = TRUE;
 			  ((procdecl *) $<decl_p>$)->include_file_ext = $7;
-			  ((procdecl *) $<decl_p>$)->params = symtab->dupscope()->reverse();
+			  ((procdecl *) $<decl_p>$)->params = symtab->dupscopereverse();
 			  symtab->pushscope();
 			  returntype = voidtype;
 			  symtab->declare_global($2, $<decl_p>$);
@@ -661,7 +661,7 @@ procDecl:
 			{
 			  $<decl_p>$ = new procdecl();
 			  ((procdecl *) $<decl_p>$)->params =
-			    symtab->dupscope()->reverse();
+			    symtab->dupscopereverse();
 			  symtab->pushscope();
 			  returntype = voidtype;
 			}
@@ -698,7 +698,7 @@ funcDecl:
 			{
 			  funcdecl * func = new funcdecl;
 			  $<decl_p>$ = func;
-			  func->params = symtab->dupscope()->reverse();
+			  func->params = symtab->dupscopereverse();
 			  if ($9->name == NULL)
 			    symtab->declare_global(
 						   ltable.enter(

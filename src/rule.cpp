@@ -48,7 +48,7 @@ simplerule::simplerule(ste * enclosures,
 		       expr * condition,
 		       ste * locals, stmt * body, 
 		       int priority)
-:rule(), name(name), enclosures(enclosures), condition(condition),
+:rule(), name(NULL), enclosures(enclosures), condition(condition),
 locals(locals), body(body), condname(NULL), rulename(NULL), 
 priority(priority)
 {
@@ -270,6 +270,7 @@ pctl::pctl(pctl * subf1, pctl * subf2, expr * ap, pctl_type pctltype,
 	   int until_bound, expr * prob_bound)
 :subformula1(subf1),
 subformula2(subf2),
+op(PCTL_L),
 atomic_proposition(ap),
 pctltype(pctltype), code(new_int() + 1), until_bound(until_bound)
 {

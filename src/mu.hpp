@@ -70,6 +70,7 @@ class TNode {
 public:
   TNode() {
   };
+  virtual ~TNode() {}
   virtual const char *generate_code(void) {
     return NULL;
   };
@@ -302,6 +303,8 @@ public:
    * at the top of the stack. */
   ste *dupscope() const;
   /* return a copy of the ste's in the top scope. */
+  ste *dupscopereverse() const;
+  /* shortcut for dupscope()->reverse() with check for a NULL scope */
   ste *topste() const {
     return scopestack[scopedepth];
   };
@@ -406,6 +409,7 @@ struct rulerec {
       next(NULL), probbound(NULL) {
   };
   int print_rules();		/* print out a list of rulerecs. */
+  static int print_empty_rules();
 };
 
 /*---------------------------------------------------------------------------*/
@@ -423,10 +427,11 @@ struct program:TNode {
   symmetryclass symmetry;
 
    program(void)
-  :globals(NULL), procedures(NULL),
+  :bits_in_world(0), globals(NULL), procedures(NULL),
       rules(NULL), rulelist(NULL), startstatelist(NULL),
       invariantlist(NULL), pctl_form(NULL) {
-  } void make_state(int bits_in_world);
+  }
+   virtual ~program() {}
   virtual const char *generate_code();
 };
 

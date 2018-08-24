@@ -41,8 +41,6 @@
 
 static int scalarset_type_int = 0;	/* integer for scalarset type;
 					   different scalarsets get a different integer value */
-
-extern int enumval;
 // 
 // static int scalarset_const_int = 5; /* integer for scalarset ids;
 //                                     different ids get a different integer value;
@@ -59,7 +57,7 @@ typedecl *decl::gettype(void) const
 
 decl::decl()
 :
-TNode(), name(NULL), declared(FALSE)
+TNode(), name(NULL), mu_name(NULL), declared(FALSE)
 {
 }
 
@@ -85,6 +83,7 @@ typedecl::typedecl()
 :  
 decl(), scalarsetlist(NULL), structure(NoScalarset),
 bitsalloc(0),
+numbits(0), mu_type(NULL),
 already_generated_permute_function(FALSE),
 already_generated_simple_canon_function(FALSE),
 already_generated_canonicalize_function(FALSE),
@@ -101,10 +100,17 @@ already_generated_multisetlimit_function(FALSE)
 };
 
 typedecl::typedecl(char *name)
-:decl(name),
-scalarsetlist(NULL),
-structure(NoScalarset),
-bitsalloc(0), already_generated_permute_function(FALSE)
+:
+decl(name), scalarsetlist(NULL), structure(NoScalarset),
+bitsalloc(0),
+numbits(0), mu_type(NULL),
+already_generated_permute_function(FALSE),
+already_generated_simple_canon_function(FALSE),
+already_generated_canonicalize_function(FALSE),
+already_generated_simple_limit_function(FALSE),
+already_generated_array_limit_function(FALSE),
+already_generated_limit_function(FALSE),
+already_generated_multisetlimit_function(FALSE)
 {
   static int theTNum = 0;
   tNum = theTNum++;
@@ -129,7 +135,7 @@ typedecl *typedecl::getelementtype() const	// for arraytypedecl
 
 /* AP: class realtypedecl */
 realtypedecl::realtypedecl(int ac, int ex)
-:  typedecl(), accuracy(ac), exponent_value(ex)	//IM: fixed, exponent_value instead of exponent
+:  typedecl(), accuracy(ac), exponent(0), exponent_value(ex)	//IM: fixed, exponent_value instead of exponent
 {
   this->setexponentdigits();	//IM: sets this->exponent
   numbits = (int) ceil(this->getsize() / 2.0) * 8;
@@ -139,7 +145,7 @@ realtypedecl::realtypedecl(int ac, int ex)
 }
 
 realtypedecl::realtypedecl(expr * ac, expr * ex)
-:  typedecl()
+:  typedecl(), accuracy(0), exponent(0), exponent_value(0)
 {
   Error.CondError(!type_equal(ac->gettype(), inttype),
 		  "Only integer accuracy allowed.");
@@ -167,7 +173,7 @@ realtypedecl::realtypedecl(expr * ac, expr * ex)
   class enumtypedecl
   ********************/
 enumtypedecl::enumtypedecl(int l, int r)
-:typedecl(), left(l), right(r)
+:typedecl(), left(l), right(r), idvalues(NULL)
 {
 //   shift = (left > 1 ? left-1 : 0);
 //   this->left -= shift;
@@ -294,7 +300,7 @@ multisettypedecl::multisettypedecl(bool interleaved,
 				   expr * e, typedecl * elementtype)
 :  
 typedecl(), interleaved(interleaved), elementtype(elementtype),
-msclist(NULL)
+msclist(NULL), msrlist(NULL)
 {
   Error.CondError(!e->hasvalue(),
 		  "CONST declaration requires constant expression.");
@@ -358,6 +364,13 @@ recordtypedecl::recordtypedecl(bool interleaved, ste * fields)
 	  || structure == typedecl::ScalarsetVariable
 	  || structure == typedecl::ScalarsetArrayOfFree)
 	structure = typedecl::MultisetOfFree;
+      break;
+    case MultisetOfScalarset: // TODO: verify this case
+        if (structure == typedecl::NoScalarset
+	  || structure == typedecl::ScalarsetVariable
+	  || structure == typedecl::ScalarsetArrayOfFree
+	  || structure == typedecl::MultisetOfFree)
+	structure = typedecl::MultisetOfScalarset;
       break;
     case ScalarsetArrayOfScalarset:
       if (structure != typedecl::Complex)
@@ -501,7 +514,7 @@ uniontypedecl::uniontypedecl(stelist * unionmembers)
   class constdecl
   ********************/
 constdecl::constdecl(int value, typedecl * type)
-:decl(), value(value), type(type)
+:decl(), rvalue(value), value(value), type(type)
 {
 }
 
@@ -556,7 +569,7 @@ choosedecl::choosedecl(typedecl * type)
   class quantdecl
   ********************/
 quantdecl::quantdecl(typedecl * type)
-:  decl(), type(type), left(0), right(0), by(0)
+:  decl(), type(type), left(0), right(0), by(0), byR(0.0)
 {
   Error.CondError(!type->issimple(),
 		  "Type of 'FOR ID: type ...' must be a simple type.");

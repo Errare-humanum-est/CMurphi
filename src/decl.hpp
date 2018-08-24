@@ -47,6 +47,7 @@ public:
   // initializer
    decl();
    decl(char *name);
+   virtual ~decl() {}
 
   // subclass identifier
   enum decl_class
@@ -544,6 +545,7 @@ public:
   // initializer
    arraytypedecl(bool interleaved,
 		 typedecl * indextype, typedecl * elementtype);
+   virtual ~arraytypedecl() {}
 
   // supporting routines
   typedecl *getindextype() const {
@@ -614,12 +616,12 @@ public:
     return elementtype->HasScalarsetLeaf();
   } virtual bool HasMultisetOfFree() const {
     if (elementtype->HasMultisetOfFree()
-	&& !indextype->getstructure() == typedecl::ScalarsetVariable)
+	&& indextype->getstructure() != typedecl::ScalarsetVariable)
       return TRUE;
     return FALSE;
   } virtual bool HasMultisetOfScalarset() const {
     if (elementtype->HasMultisetOfScalarset()
-	&& !indextype->getstructure() == typedecl::ScalarsetVariable)
+	&& indextype->getstructure() != typedecl::ScalarsetVariable)
       return TRUE;
     return FALSE;
   }
@@ -1144,6 +1146,7 @@ public:
   // initializer
    constdecl(int value, typedecl * type);
    constdecl(expr * e);
+   virtual ~constdecl() {}
 
   // supporting routines
   virtual decl_class getclass() const {
@@ -1204,6 +1207,7 @@ class aliasdecl:public decl {
 public:
   // initializer
    aliasdecl(expr * ref);
+   virtual ~aliasdecl() {}
 
   // supporting routines
   virtual decl_class getclass(void) const {
@@ -1237,6 +1241,7 @@ public:
 public:
   // initializer
   choosedecl(typedecl * type);
+  virtual ~choosedecl() {}
 
   // supporting routines  
   virtual decl_class getclass() const {
@@ -1341,6 +1346,7 @@ public:
 class constparam:public param {
 public:
   constparam(typedecl * type);
+  virtual ~constparam() {}
   virtual param_class getparamclass(void) const {
     return Const;
   };

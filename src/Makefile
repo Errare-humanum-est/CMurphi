@@ -46,7 +46,7 @@ FLEX = flex
 BYACC = byacc
 
 # choice of the options
-CFLAGS = -O2                               # options for g++
+CFLAGS = -O2 -g                               # options for g++
 
 OBJS = \
 	lex.yy.o \
@@ -67,8 +67,10 @@ OBJS = \
 	symtab.o \
 	util.o
 
+all: mu
+
 mu: $(OBJS)
-	$(CPLUSPLUS) -o mu $(CFLAGS) $(OBJS)
+	$(CPLUSPLUS) -o mu $(CFLAGS) $(OBJS) -lm
 
 mu.o: mu.cpp mu.hpp y.tab.h
 	$(CPLUSPLUS) -c $(CFLAGS) mu.cpp
@@ -116,13 +118,13 @@ parse.o: parse.cpp mu.hpp y.tab.h
 	$(CPLUSPLUS) -c $(CFLAGS) parse.cpp
 
 lex.yy.o: lex.yy.c mu.hpp lextable.hpp
-	$(CPLUSPLUS) -c $(CFLAGS) lex.yy.c
+	$(CPLUSPLUS) -c -x c++ $(CFLAGS) lex.yy.c
 
 lex.yy.c: mu.l mu.hpp y.tab.h
 	$(FLEX) mu.l
 
 y.tab.o: y.tab.c mu.hpp y.tab.h
-	$(CPLUSPLUS) -c -DYYDEBUG=0 $(CFLAGS) y.tab.c
+	$(CPLUSPLUS) -c -DYYDEBUG=0 -x c++ $(CFLAGS) y.tab.c
 
 y.tab.c + y.tab.h: mu.y
 	$(BYACC) -dt mu.y

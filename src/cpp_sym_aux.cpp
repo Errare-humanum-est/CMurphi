@@ -343,7 +343,7 @@ void symmetryclass::generate_permutation_class()
 	    i, t->mu_name, t->mu_name);
     fprintf(codefile,
 	    "  void GenPerm%d(%s* perm, int size, unsigned long& index);\n",
-	    i, t->mu_name, i, t->mu_name, i, t->mu_name);
+	    i, t->mu_name);
     fprintf(codefile, "\n");
   }
   fprintf(codefile,

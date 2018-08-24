@@ -642,7 +642,7 @@ const char *arraytypedecl::generate_decl()
 //	    "  if (name) delete [] name;\n"
 	    // "  for(int i = 0; i < %d; i++)\n"
 	    // "    delete[ OLD_GPP(strlen(array[i].name) +1) ] array[i].name; // Should be delete[] \n"
-	    "}\n", mu_name, mu_name, indextype->getsize());
+	    "}\n", mu_name, mu_name/*, indextype->getsize()*/);
 
     fprintf(codefile, "/*** end array declaration ***/\n");
     fprintf(codefile, "%s %s_undefined_var;\n\n", mu_name, mu_name);
@@ -685,11 +685,11 @@ const char *multisettypedecl::generate_decl()
 	    maximum_size,	/* array size */
 	    maximum_size,	/* array size */
 	    mu_name,		/* name for first constructor */
-	    /* maximum_size,  /* max current size */
-	    /* CeilLog2(maximum_size+2),  /* max current size */
+	    // maximum_size,  /* max current size */
+	    // CeilLog2(maximum_size+2),  /* max current size */
 	    mu_name,		/* name for second constructor */
-	    /* maximum_size,  /* max current size */
-	    /* CeilLog2(maximum_size+2),  /* max current size */
+	    // maximum_size,  /* max current size */
+	    // CeilLog2(maximum_size+2),  /* max current size */
 	    mu_name);		/* destructor name */
 
     /* no range-checked operator [] */
@@ -746,7 +746,7 @@ const char *multisettypedecl::generate_decl()
     fprintf(codefile,
 	    "friend int CompareWeight(%s& a, %s& b)\n"
 	    "  {\n"
-	    "    return 0;\n" "  }\n", mu_name, mu_name, maximum_size);
+	    "    return 0;\n" "  }\n", mu_name, mu_name);
 
     /* comparsion function */
     fprintf(codefile,
@@ -949,7 +949,7 @@ const char *multisettypedecl::generate_decl()
 	    // "  for(int i = 0; i < %d; i++)\n"
 	    // "    delete[ OLD_GPP(strlen(array[i].name) +1) ] array[i].name; // Should be delete[] \n"
 	    // "  delete[ OLD_GPP(strlen(current_size[i].name) +1) ] current_size.name; // Should be delete[] \n"
-	    "}\n", mu_name, mu_name, maximum_size);
+	    "}\n", mu_name, mu_name/*, maximum_size*/);
 
     // declare procedures for all multisetcount
     if (msclist != NULL)
@@ -1429,11 +1429,13 @@ const char *uniontypedecl::generate_decl()
 	      "    if (val == -1) return -1;\n");
       make_bit_compacted_value(unionmembers);
       fprintf(codefile,
+	      "    return -1;\n"
 	      "  }\n"
 	      "  inline int value(int val)\n"
 	      "  {\n" "    if (val == -1) { undefine(); return -1; }\n");
       make_bit_compacted_value_assign(unionmembers);
       fprintf(codefile,
+	      "    return -1;\n"
 	      "  }\n"
 	      "  inline int indexvalue() const\n"
 	      "  {\n" "    return mu__byte::value();\n" "  };\n");
@@ -1773,7 +1775,8 @@ const char *procdecl::generate_decl()
       fprintf(codefile, ")\n" "{\n");
 
       /* the locals. */
-      decls->generate_decls();
+      if (decls != NULL)
+        decls->generate_decls();
 
       /* the statements. */
       for (stmt * s = body; s != NULL; s = s->next) {
@@ -1815,13 +1818,18 @@ const char *funcdecl::generate_decl()
       fprintf(codefile, ")\n" "{\n");
 
       /* the locals. */
-      decls->generate_decls();
+      if (decls != NULL)
+        decls->generate_decls();
 
       /* the statements. */
       for (stmt * s = body; s != NULL; s = s->next) {
 	s->generate_code();
       }
 
+      // BUG: this causes "control reaches end of non-void function" warnings
+      //      in newer compilers, even when it is not true (i.e., our detection
+      //      conflicts with their detection). Truly fixing this will require
+      //      doing our own analysis, and raising a compile error instead.
       fprintf(codefile,
 	      "	Error.Error(\"The end of function %s reached without returning values.\");\n",
 	      name);
@@ -2101,6 +2109,7 @@ const char *mathexpr::generate_code()
       break;
     }
   }
+  return "";
 }
 
 /********************
@@ -2369,73 +2378,61 @@ const char *designator::generate_code()
  ********************/
 const char *exprlist::generate_code(const char *name, ste * formals)
 {
-  exprlist *ex = this;
-  if (this == NULL) {
-    // exprlist_buffer_end = exprlist_buffer;
-    return "ERROR!";
-  } else {
-    char *exprlist_buffer = new char[BUFFER_SIZE];
-    char *exprlist_buffer_end = exprlist_buffer;
-    for (ex = this; formals != NULL && ex != NULL;
+	exprlist *ex = this;
+	char *exprlist_buffer = new char[BUFFER_SIZE];
+	char *exprlist_buffer_end = exprlist_buffer;
+	for (ex = this; formals != NULL && ex != NULL;
 	 formals = formals->getnext(), ex = ex->next) {
-      param *f = (param *) formals->getvalue();
-      if (!ex->undefined) {
+	  param *f = (param *) formals->getvalue();
+	  if (!ex->undefined) {
 	if (f->gettype() != ex->e->gettype() &&
-	    ((ex->e->gettype()->gettypeclass() == typedecl::Range
-	      && ((f->gettype()->gettype() == ex->e->gettype()->gettype())
+		((ex->e->gettype()->gettypeclass() == typedecl::Range
+		  && ((f->gettype()->gettype() == ex->e->gettype()->gettype())
 		  || (type_equal(f->gettype(), realtype)))
-	     )
-	     ||
-	     ((ex->e->gettype()->gettypeclass() == typedecl::Scalarset
-	       || ex->e->gettype()->gettypeclass() == typedecl::Enum)
-	      && f->gettype()->gettypeclass() == typedecl::Union)
-	     ||
-	     (ex->e->gettype()->gettypeclass() == typedecl::Union
-	      && (f->gettype()->gettypeclass() == typedecl::Scalarset
+		 )
+		 ||
+		 ((ex->e->gettype()->gettypeclass() == typedecl::Scalarset
+		   || ex->e->gettype()->gettypeclass() == typedecl::Enum)
+		  && f->gettype()->gettypeclass() == typedecl::Union)
+		 ||
+		 (ex->e->gettype()->gettypeclass() == typedecl::Union
+		  && (f->gettype()->gettypeclass() == typedecl::Scalarset
 		  || f->gettype()->gettypeclass() == typedecl::Enum))
-	    )
-	    )
+		)
+		)
 	  sprintf(exprlist_buffer_end, ", (int)%s",
 		  ex->e->generate_code());
 	else if (f->gettype() != ex->e->gettype()
 		 && (type_equal(ex->e->gettype(), realtype)
-		     && f->gettype()->gettype() ==
-		     ex->e->gettype()->gettype()))
+			 && f->gettype()->gettype() ==
+			 ex->e->gettype()->gettype()))
 	  sprintf(exprlist_buffer_end, ", (double)%s",
 		  ex->e->generate_code());
 	else
 	  sprintf(exprlist_buffer_end, ", %s", ex->e->generate_code());
-      } else {
+	  } else {
 	sprintf(exprlist_buffer_end, ", %s_undefined_var",
 		f->gettype()->generate_code());
-      }
-      exprlist_buffer_end += strlen(exprlist_buffer_end);
-    }
-    if (strlen(exprlist_buffer) > BUFFER_SIZE)
-      Error.Error("Internal: Buffer size for expression list overflow.\n"
+	  }
+	  exprlist_buffer_end += strlen(exprlist_buffer_end);
+	}
+	if (strlen(exprlist_buffer) > BUFFER_SIZE)
+	  Error.Error("Internal: Buffer size for expression list overflow.\n"
 		  "	  Please increase BUFFER_SIZE in /src/mu.h");
-    return (exprlist_buffer + 2);	// + 2 to skip the leading comma and space
-    /* BUG: Aargh! We can\'t delete the buffer! */
-  }
+	return (exprlist_buffer + 2);	// + 2 to skip the leading comma and space
+	/* BUG: Aargh! We can\'t delete the buffer! */
 }
 
 // char *exprlist::generate_code()
 // {
-//   exprlist *ex = this;
-//   if (this == NULL ) {
-//     // exprlist_buffer_end = exprlist_buffer;
-//     return "ERROR!";
+//   char *exprlist_buffer = new char[BUFFER_SIZE];
+//   char *exprlist_buffer_end = exprlist_buffer;
+//   for (ex = this; ex != NULL; ex = ex->next) {
+//     sprintf(exprlist_buffer_end, ", %s", ex->e->generate_code() );
+//     exprlist_buffer_end += strlen(exprlist_buffer_end);
 //   }
-//   else {
-//     char *exprlist_buffer = new char[BUFFER_SIZE];
-//     char *exprlist_buffer_end = exprlist_buffer;
-//     for (ex = this; ex != NULL; ex = ex->next) {
-//       sprintf(exprlist_buffer_end, ", %s", ex->e->generate_code() );
-//       exprlist_buffer_end += strlen(exprlist_buffer_end);
-//     }
-//     return ( exprlist_buffer + 2); // + 2 to skip the leading comma and space
-//     /* BUG: Aargh! We can\'t delete the buffer! */
-//     }
+//   return ( exprlist_buffer + 2); // + 2 to skip the leading comma and space
+//   /* BUG: Aargh! We can\'t delete the buffer! */
 // }
 
 /********************
@@ -2503,9 +2500,9 @@ void multisetcount::generate_procedure()
 
 const char *multisetcount::generate_code()
 {
-  /* set->gettype()->getelementtype()->generate_code(), /* element type */
-  /* set->gettype()->generate_code(), /* multiset type */
-  /*  multisetcount_num,               /* procedure number */
+  // set->gettype()->getelementtype()->generate_code(), /* element type */
+  // set->gettype()->generate_code(), /* multiset type */
+  //  multisetcount_num,               /* procedure number */
   int num = new_int();
   char *temp = tsprintf("mu__intexpr%d", num);
   fprintf(codefile, "/*** begin multisetcount %d declaration ***/\n",
@@ -2863,7 +2860,8 @@ const char *alias::generate_code()
 const char *aliasstmt::generate_code()
 {
   fprintf(codefile, "{\n");
-  aliases->generate_decls();
+  if (aliases != NULL)
+    aliases->generate_decls();
   for (stmt * b = body; b != NULL; b = b->next)
     b->generate_code();
   fprintf(codefile, "}\n");
@@ -3580,7 +3578,8 @@ const char *simplerule::generate_code()
   fprintf(codefile, "  void Code(unsigned r)\n" "  {\n");
   generate_rule_params_assignment(enclosures);
   generate_rule_aliases(enclosures);
-  locals->generate_decls();
+  if (locals != NULL)
+    locals->generate_decls();
   for (stmt * b = body; b != NULL; b = b->next)
     b->generate_code();
   fprintf(codefile, "  };\n" "\n");
@@ -3614,7 +3613,8 @@ const char *startstate::generate_code()
   fprintf(codefile, "  void Code(unsigned short r)\n" "  {\n");
   generate_rule_params_assignment(enclosures);
   generate_rule_aliases(enclosures);
-  locals->generate_decls();
+  if (locals != NULL)
+    locals->generate_decls();
   for (stmt * b = body; b != NULL; b = b->next)
     b->generate_code();
   fprintf(codefile, "  };\n" "\n");
@@ -3692,6 +3692,8 @@ const char *pctl::getstring(pctl_type t)
   case NOT_PCTL:
     return "NOT_PCTL";
   }
+  Error.Error("Internal: unknown PCTL type %d", (int)t);
+  return "";
 }
 
 const char *pctl::getstring(pctl_ord o)
@@ -3706,6 +3708,8 @@ const char *pctl::getstring(pctl_ord o)
   case PCTL_GEQ:
     return "PCTL_GEQ";
   }
+  Error.Error("Internal: unknown PCTL ord %d", (int)o);
+  return "";
 }
 
 void pctl::generate_non_atomic_subformulas(pctl * formula)
@@ -3815,22 +3819,18 @@ const char *aliasrule::generate_code()
 /* process a list of ste\'s in reverse order. */
 const char *ste::generate_decls()
 {
-  if (this != NULL) {
-    if (next != NULL && next->scope == scope)
-      next->generate_decls();
-    value->generate_decl();
-  }
-  return "ERROR!";
+  if (next != NULL && next->scope == scope)
+    next->generate_decls();
+  value->generate_decl();
+  return "";
 }
 
 // char *ste::generate_alias_decls()
 // {
-//   if ( this != NULL ) {
-//       value->generate_decl();
-//       if ( next != NULL && next->scope == scope )
+//     value->generate_decl();
+//     if ( next != NULL && next->scope == scope )
 //  next->generate_decls();
-//     }
-//   return "ERROR!";
+//   return "";
 // }
 
 typedef void (*varproc) (vardecl * var);
@@ -4001,24 +4001,26 @@ int rulerec::print_rules()
 {
   rulerec *r = this;
   int i = 0;
-  if (r != NULL) {
-    for (; r != NULL; r = r->next) {
-      fprintf(codefile, "{\"%s\", ", r->rulename);
-      if (r->conditionname == NULL)
-	fprintf(codefile, "NULL, ");
-      else
-	fprintf(codefile, "&%s, ", r->conditionname);
-      if (r->bodyname == NULL)
-	fprintf(codefile, "NULL, ");
-      else
-	fprintf(codefile, "&%s, ", r->bodyname);
-      fprintf(codefile, "},\n");
-      i++;
-    }
-  } else {
-    fprintf(codefile, "{ NULL, NULL, NULL, FALSE }");
-  }
-  return i;
+  for (; r != NULL; r = r->next) {
+    fprintf(codefile, "{\"%s\", ", r->rulename);
+    if (r->conditionname == NULL)
+  fprintf(codefile, "NULL, ");
+    else
+  fprintf(codefile, "&%s, ", r->conditionname);
+    if (r->bodyname == NULL)
+  fprintf(codefile, "NULL, ");
+    else
+  fprintf(codefile, "&%s, ", r->bodyname);
+    fprintf(codefile, "},\n");
+    i++;
+}
+return i;
+}
+
+int rulerec::print_empty_rules()
+{
+  fprintf(codefile, "{ NULL, NULL, NULL, FALSE }");
+  return 0;
 }
 
 int generate_invariants()
@@ -4337,7 +4339,8 @@ const char *program::generate_code()
   if (typedecl::origin != NULL)
     typedecl::origin->generate_all_decl();
   // globals->generate_decls() gets done by procedures->generate_decls
-  procedures->generate_decls();
+  if (procedures != NULL)
+    procedures->generate_decls();
   fprintf(codefile, "\n\n\n");
 
   // generate the world
@@ -4361,7 +4364,10 @@ const char *program::generate_code()
 //   fprintf(codefile,"\n/********************\n  Rule records\n");
 //   fprintf(codefile," ********************/\n");
 //   fprintf(codefile, "const rulerec rules[] = {\n");
-//   count = rulelist->print_rules();
+//   if (rulelist != NULL)
+//     count = rulelist->print_rules();
+//   else
+//     count = rulerec::print_empty_rules();
 //   fprintf(codefile,"};\n");
 
   count = generate_ruleset();
@@ -4380,7 +4386,10 @@ const char *program::generate_code()
   fprintf(codefile, " ********************/\n");
 
 //  fprintf(codefile, "const rulerec startstates[] = {\n");
-//  count = startstatelist->print_rules();
+//  if (startstatelist != NULL)
+//    count = startstatelist->print_rules();
+//  else
+//    count = rulerec::print_empty_rules();
 //  fprintf(codefile,"};\n");
   count = generate_startstates();
   fprintf(codefile, "const rulerec startstates[] = {\n");
@@ -4406,7 +4415,10 @@ const char *program::generate_code()
     fprintf(codefile, " ********************/\n");
     (void) generate_invariants();
     fprintf(codefile, "const rulerec invariants[] = {\n");
-    count = invariantlist->print_rules();
+    if (invariantlist != NULL)
+      count = invariantlist->print_rules();
+    else
+      count = rulerec::print_empty_rules();
     fprintf(codefile, "};\n");
     fprintf(codefile, "const unsigned short numinvariants = %d;\n", count);
 
