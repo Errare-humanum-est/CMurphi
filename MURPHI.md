@@ -1,67 +1,22 @@
-CMurphi is free software; you can redistribute it and/or 
-modify it under the terms of the GNU Lesser General Public 
-License as published by the Free Software Foundation; either 
-of the License, or (at your option) any later version.
-
-CMurphi is distributed in the hope that it will be useful, 
-but WITHOUT ANY WARRANTY; without even the implied warranty of 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public 
-License along with this library; if not, write to the Free Software 
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA.
-
-To contact the CMurphi development board, email to <melatti@di.uniroma1.it>
-Copyright (C) 2009-2012 by Sapienza University of Rome. 
-
-HISTORY
-
-CMurphi heavily lies on the Murphi model checker by Stanford. Many errors have
-been corrected, but some could still be there (especially in symmetry
-reduction). Moreover, the software architecture is not the best one, since
-CMurphi has evolved in order to be as compatible as possible with the original
-Murphi, rather than employing the best C++ features.
-
-Starting from version CMurphi 5.4, a major refactoring has been done. Version 
-history starting from CMurphi 5.4 is the following:
-
-5.4.1: 64 bits for caching, fix
-5.4.2: some Intel warnings caught
-5.4.3: fixings to compile on Cygwin
-5.4.4: fixed -d option
-5.4.5: option --noht added, counterexample in DFS by reading the stack, some 
-       errors fixed
-5.4.6: option --trace-dfs added: counterexample in DFS by reading the stack also
-       available with hashtable
-5.4.7: corrected an error in disk algorithm
-5.4.8: corrected an error in simulation error tracing (thanks to Mark R. Tuttle)
-5.4.9: corrected an error when handling both --noht and --trace-dfs
-5.4.9.1: corrected an old error (back to Murphi) on cpp_code.cpp (thanks to
-         Matthew Fernandez)
-
-Here is the original Murphi license, also mentioning the original Murphi
-authors:
-
-Copyright (C) 1992 - 1999 by the Board of Trustees of Leland Stanford 
+Copyright (C) 1992--1999 by the Board of Trustees of Leland Stanford
 Junior University.
 
 License to use, copy, modify, sell and/or distribute this software
 and its documentation any purpose is hereby granted without royalty,
 subject to the following terms and conditions:
 
-1.  The above copyright notice and this permission notice must
+1. The above copyright notice and this permission notice must
 appear in all copies of the software and related documentation.
 
-2.  The name of Stanford University may not be used in advertising or
+2. The name of Stanford University may not be used in advertising or
 publicity pertaining to distribution of the software without the
 specific, prior written permission of Stanford.
 
-3.  This software may not be called "Murphi" if it has been modified
+3. This software may not be called "Murphi" if it has been modified
 in any way, without the specific prior written permission of David L.
 Dill.
 
-4.  THE SOFTWARE IS PROVIDED "AS-IS" AND STANFORD MAKES NO
+4. THE SOFTWARE IS PROVIDED "AS-IS" AND STANFORD MAKES NO
 REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE,
 BUT NOT LIMITATION.  STANFORD MAKES NO REPRESENTATIONS OR WARRANTIES
 OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE
@@ -80,11 +35,9 @@ injury to person or damage to property arising from or out of the
 possession, use, or operation of Software or Licensed Program(s) by
 LICENSEE or its customers.
 
-Notes:
+## Responsible use
 
-A.  Responsible use:
-
-Murphi is to be used as a DEBUGGING AID, not as a means of 
+Murphi is to be used as a DEBUGGING AID, not as a means of
 guaranteeing the correctness of a design.  We do not guarantee
 that all errors can be caught with Murphi.  There are many
 reasons for this:
@@ -105,13 +58,13 @@ manifested when the objects are large.
 4. The description of a design may not be consistent with what
 is actually implemented.
 
-5.  Murphi may have bugs that cause errors to be overlooked.
+5. Murphi may have bugs that cause errors to be overlooked.
 
 In short, Murphi is totally inadequate for guaranteeing that there are
 no errors; however, it is sometimes effective for discovering errors
 that are difficult to detect by other means.
 
-B.  Courtesy
+## Courtesy
 
 Our motivation in distributing this software freely is to encourage
 others to evaluate its effectiveness on a wider range of applications
@@ -125,10 +78,10 @@ examples that can be added to the distribution, and enhancements to
 the verification system.  Although we do not promise to distribute the
 examples or enhancements, we may do so if feasible.
 
-C.  Historical Notes
+## Historical Notes
 
 The first version of the Murphi language and verification system was
-originally designed in 1990-1991 by David Dill, Andreas Drexler, Alan
+originally designed in 1990--1991 by David Dill, Andreas Drexler, Alan
 Hu, and Han Yang of the Stanford University Computer Systems
 Laboratory.  The first version of the program was primarily
 implemented by Andreas Drexler.
@@ -153,11 +106,9 @@ and IBM.
 These notes are based on information provided to Stanford that has
 not been independently verified or checked.
 
-D.  Support, comments, feedback
+## Support, comments, feedback
 
 If you need help or have comments or suggestions regarding Murphi,
-please send electronic mail to "murphi@verify.stanford.edu".  We do
+please send electronic mail to <murphi@verify.stanford.edu>.  We do
 not have the resources to provide commercial-quality support,
 but we may be able to help you.
-
-
