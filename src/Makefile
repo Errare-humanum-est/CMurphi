@@ -46,7 +46,7 @@ FLEX = flex
 BYACC = byacc
 
 # choice of the options
-CFLAGS = -O2 -g                               # options for g++
+CFLAGS = -O2                               # options for g++
 
 OBJS = \
 	lex.yy.o \
