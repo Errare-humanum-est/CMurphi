@@ -1,3 +1,9 @@
+## Build dependencies
+$sudo apt-get install bison
+$sudo apt-get install byacc
+$sudo apt-get install flex
+
+## General
 CMurphi (Caching Murphi) is a model checker developed on the top of Murphi.
 
 The original Murphi web page is [archived here](https://web.archive.org/web/20140406081619/http://verify.stanford.edu/dill/murphi.html) (Stanford University), while a more up-to-date page is [here](https://formalverification.cs.utah.edu/Murphi/) (University of Utah).
