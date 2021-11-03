@@ -1,6 +1,8 @@
 ## Build dependencies
 $sudo apt-get install bison
+
 $sudo apt-get install byacc
+
 $sudo apt-get install flex
 
 ## General
