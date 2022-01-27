@@ -61,6 +61,9 @@
 #include <stdarg.h>
 #include <float.h>
 #include <math.h>
+# define YYSTYPE_IS_DECLARED 1
+typedef union YYSTYPE YYSTYPE;
+extern YYSTYPE yylval;
 #include "y.tab.h"
 
 /*---------------------------------------------------------------------------*/
@@ -458,6 +461,7 @@ extern int yyparse(void);	/* shouldn't this get declared in y.tab.h? */
     -- don't get redefinitions when y.tab.c #include's this which #include's
     -- y_tab.h.                                                              */
 /*---------------------------------------------------------------------------*/
+
 union YYSTYPE {			/* sloppy, sloppy, sloppy. Bleah. */
   TNode *node;
   expr *expr_p;			// an expression.
@@ -480,8 +484,5 @@ union YYSTYPE {			/* sloppy, sloppy, sloppy. Bleah. */
   exprlist *exprlist_p;		// a list of expressions.
 };
 
-typedef union YYSTYPE YYSTYPE;
-
-extern YYSTYPE yylval;
 
 #endif
